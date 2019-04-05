@@ -329,52 +329,52 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
 
   function createTypeDecorator(exp: any) {
     return ts.createNodeArray<ts.Decorator>([ts.createDecorator(ts.createCall(
-			ts.createIdentifier('Reflect.metadata'), undefined, [ts.createLiteral(TypeMetadataKey), exp]
+      ts.createIdentifier('Reflect.metadata'), undefined, [ts.createLiteral(TypeMetadataKey), exp]
     ))])
   }
 
   function createParentClassDecorators(node: ts.InterfaceTypeWithDeclaredMembers, ctx: Ctx): ts.NodeArray<ts.Decorator> {
-		return ts.createNodeArray<ts.Decorator>((node.getBaseTypes() || []).reduce((result, base) => {
-		  if (base.flags & ts.TypeFlags.Object && (<ts.ObjectType>base).objectFlags & ts.ObjectFlags.Reference) {
-		    const reference = <ts.TypeReference> base;
-		    const symbol = reference.target.getSymbol();
+    return ts.createNodeArray<ts.Decorator>((node.getBaseTypes() || []).reduce((result, base) => {
+      if (base.flags & ts.TypeFlags.Object && (<ts.ObjectType>base).objectFlags & ts.ObjectFlags.Reference) {
+        const reference = <ts.TypeReference> base;
+        const symbol = reference.target.getSymbol();
 
-		    if (!(reference.target.objectFlags & ts.ObjectFlags.Tuple) && symbol && symbol.valueDeclaration) {
- 					return result.concat([ts.createDecorator(
-						ts.createFunctionExpression(
-							undefined,
-							undefined,
-							undefined,
-							undefined,
-							[ts.createParameter(undefined, undefined, undefined, 'target')],
-							undefined,
-							ts.createBlock([
-								ts.createStatement(
-									ts.createCall(ts.createIdentifier('Reflect.defineMetadata'), undefined, [
-										ts.createLiteral(SubclassMetadataKey),
-										ts.createArrayLiteral([
-											ts.createSpread(
-												ts.createLogicalOr(
-													ts.createCall(ts.createIdentifier('Reflect.getMetadata'), undefined, [
-														ts.createLiteral(SubclassMetadataKey),
-														getIdentifierForSymbol(reference.target, ctx)
-													]),
-													ts.createArrayLiteral([])
+        if (!(reference.target.objectFlags & ts.ObjectFlags.Tuple) && symbol && symbol.valueDeclaration) {
+           return result.concat([ts.createDecorator(
+            ts.createFunctionExpression(
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              [ts.createParameter(undefined, undefined, undefined, 'target')],
+              undefined,
+              ts.createBlock([
+                ts.createStatement(
+                  ts.createCall(ts.createIdentifier('Reflect.defineMetadata'), undefined, [
+                    ts.createLiteral(SubclassMetadataKey),
+                    ts.createArrayLiteral([
+                      ts.createSpread(
+                        ts.createLogicalOr(
+                          ts.createCall(ts.createIdentifier('Reflect.getMetadata'), undefined, [
+                            ts.createLiteral(SubclassMetadataKey),
+                            getIdentifierForSymbol(reference.target, ctx)
+                          ]),
+                          ts.createArrayLiteral([])
                         )
-											),
-										  ts.createIdentifier('target')
-										]),
-										getIdentifierForSymbol(reference.target, ctx)
-									])
+                      ),
+                      ts.createIdentifier('target')
+                    ]),
+                    getIdentifierForSymbol(reference.target, ctx)
+                  ])
                 )
-							])
+              ])
             )
           )])
         } else {
           return result;
         }
       } else {
-		    return result;
+        return result;
       }
     }, <Array<ts.Decorator>>[]));
   }
@@ -446,8 +446,8 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
     const newNode = ts.getMutableClone(node);
     newNode.members = newMembers
     newNode.decorators = combineDecorators(
-			combineDecorators(node.decorators, createTypeDecorator(classTypeExp)),
-			createParentClassDecorators(<ts.InterfaceTypeWithDeclaredMembers>type, { node })
+      combineDecorators(node.decorators, createTypeDecorator(classTypeExp)),
+      createParentClassDecorators(<ts.InterfaceTypeWithDeclaredMembers>type, { node })
     )
     return newNode
   }
