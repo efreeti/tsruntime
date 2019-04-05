@@ -107,11 +107,16 @@ export const Reflective = ReflectiveFactory(function (target: any) {
 
 
 
-export const MetadataKey = "tsruntime:type"
+export const TypeMetadataKey = "ts-runtime-reflection:type"
+export const SubclassMetadataKey = "ts-runtime-reflection:subtypes"
 
+
+export function getSubclasses(target: Function): Function[] | undefined {
+  return Reflect.getMetadata(SubclassMetadataKey, target)
+}
 
 export function getType(target: Function): Types.Type | undefined {
-  return Reflect.getMetadata(MetadataKey, target)
+  return Reflect.getMetadata(TypeMetadataKey, target)
 }
 
 export function mustGetType(target: Function): Types.Type {
@@ -135,5 +140,5 @@ export function mustGetPropType(target: Function, propertyKey: string | symbol |
 
 
 export function getPropType(target: Function, propertyKey: string | symbol | number): Types.Type | undefined {
-  return Reflect.getMetadata(MetadataKey, target.prototype, propertyKey as any)
+  return Reflect.getMetadata(TypeMetadataKey, target.prototype, propertyKey as any)
 }
