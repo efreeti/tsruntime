@@ -1,6 +1,6 @@
 {
-  "name": "tsruntime",
-  "version": "2.1.2",
+  "name": "ts-runtime-reflection",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
