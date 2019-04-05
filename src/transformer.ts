@@ -1,6 +1,6 @@
 
 import * as ts from 'typescript';
-import { Types, MetadataKey, REFLECTIVE_KEY } from './types';
+import { Types, TypeMetadataKey, SubclassMetadataKey, REFLECTIVE_KEY } from './types';
 import * as tse from './typescript-extended'
 
 
@@ -315,15 +315,68 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
 
 
   let currentScope: ts.SourceFile | ts.CaseBlock | ts.ModuleBlock | ts.Block;
-  function addDecorator(oldDecorators: ts.NodeArray<ts.Decorator> | undefined, exp: any) {
+
+  function combineDecorators(group1: ts.NodeArray<ts.Decorator> | undefined, group2: ts.NodeArray<ts.Decorator> | undefined) {
     let newDecorators = []
-    if (oldDecorators !== undefined) {
-      newDecorators.push(...oldDecorators)
+    if (group1 !== undefined) {
+      newDecorators.push(...group1)
     }
-    const decCall = ts.createCall(ts.createIdentifier('Reflect.metadata'), undefined, [ts.createLiteral(MetadataKey), exp])
-    const dec = ts.createDecorator(decCall)
-    newDecorators.push(dec)
+    if (group2 !== undefined) {
+      newDecorators.push(...group2)
+    }
     return ts.createNodeArray<ts.Decorator>(newDecorators)
+  }
+
+  function createTypeDecorator(exp: any) {
+    return ts.createNodeArray<ts.Decorator>([ts.createDecorator(ts.createCall(
+			ts.createIdentifier('Reflect.metadata'), undefined, [ts.createLiteral(TypeMetadataKey), exp]
+    ))])
+  }
+
+  function createParentClassDecorators(node: ts.InterfaceTypeWithDeclaredMembers, ctx: Ctx): ts.NodeArray<ts.Decorator> {
+		return ts.createNodeArray<ts.Decorator>((node.getBaseTypes() || []).reduce((result, base) => {
+		  if (base.flags & ts.TypeFlags.Object && (<ts.ObjectType>base).objectFlags & ts.ObjectFlags.Reference) {
+		    const reference = <ts.TypeReference> base;
+		    const symbol = reference.target.getSymbol();
+
+		    if (!(reference.target.objectFlags & ts.ObjectFlags.Tuple) && symbol && symbol.valueDeclaration) {
+ 					return result.concat([ts.createDecorator(
+						ts.createFunctionExpression(
+							undefined,
+							undefined,
+							undefined,
+							undefined,
+							[ts.createParameter(undefined, undefined, undefined, 'target')],
+							undefined,
+							ts.createBlock([
+								ts.createStatement(
+									ts.createCall(ts.createIdentifier('Reflect.defineMetadata'), undefined, [
+										ts.createLiteral(SubclassMetadataKey),
+										ts.createArrayLiteral([
+											ts.createSpread(
+												ts.createLogicalOr(
+													ts.createCall(ts.createIdentifier('Reflect.getMetadata'), undefined, [
+														ts.createLiteral(SubclassMetadataKey),
+														getIdentifierForSymbol(reference.target, ctx)
+													]),
+													ts.createArrayLiteral([])
+                        )
+											),
+										  ts.createIdentifier('target')
+										]),
+										getIdentifierForSymbol(reference.target, ctx)
+									])
+                )
+							])
+            )
+          )])
+        } else {
+          return result;
+        }
+      } else {
+		    return result;
+      }
+    }, <Array<ts.Decorator>>[]));
   }
 
   function visitPropertyDeclaration(node: tse.PropertyDeclaration, allprops: ts.PropertyName[]) {
@@ -336,7 +389,7 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
     }
     serializedType.initializer = initializerExp
     const objLiteral = makeLiteral(serializedType)
-    const newDecorators = addDecorator(node.decorators, objLiteral)
+    const newDecorators = combineDecorators(node.decorators, createTypeDecorator(objLiteral))
     let newNode = ts.getMutableClone(node);
     newNode.decorators = newDecorators
     return newNode
@@ -392,7 +445,10 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
 
     const newNode = ts.getMutableClone(node);
     newNode.members = newMembers
-    newNode.decorators = addDecorator(node.decorators, classTypeExp)
+    newNode.decorators = combineDecorators(
+			combineDecorators(node.decorators, createTypeDecorator(classTypeExp)),
+			createParentClassDecorators(<ts.InterfaceTypeWithDeclaredMembers>type, { node })
+    )
     return newNode
   }
   function onBeforeVisitNode(node: ts.Node) {
