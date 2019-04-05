@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/goloveychuk/tsruntime.git"
+    "url": "https://github.com/efreeti/ts-runtime-reflection.git"
   },
   "keywords": [
     "typescript",
@@ -22,9 +22,9 @@
     "runtime"
   ],
   "bugs": {
-    "url": "https://github.com/goloveychuk/tsruntime/issues"
+    "url": "https://github.com/efreeti/ts-runtime-reflection/issues"
   },
-  "homepage": "https://github.com/goloveychuk/tsruntime",
+  "homepage": "https://github.com/efreeti/ts-runtime-reflection",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^7.0.18",
