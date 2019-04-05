@@ -340,7 +340,7 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
         const symbol = reference.target.getSymbol();
 
         if (!(reference.target.objectFlags & ts.ObjectFlags.Tuple) && symbol && symbol.valueDeclaration) {
-           return result.concat([ts.createDecorator(
+          return result.concat([ts.createDecorator(
             ts.createFunctionExpression(
               undefined,
               undefined,
