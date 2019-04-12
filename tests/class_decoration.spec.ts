@@ -23,6 +23,14 @@ class TestClass extends Array<string> {
     method() {
         return 'asd'
     }
+    constructor(
+        public publicShorthandProp: string,
+        private privateShorthandProp: number,
+        protected protectedShorthandProp: boolean,
+        readonly readonlyShorthandProp: Date
+    ) {
+      super();
+    }
 }
 
 @Reflective
@@ -41,9 +49,17 @@ describe('Class decoration', () => {
       expect(ptype.name).toEqual('TestClass')
       expect(ptype.extends).toEqual({kind: TypeKind.Reference, type: Array, arguments: [{kind: TypeKind.String} as any]})
 
-      expect(ptype.props).toEqual(['str', 'str-str', 42])
+      expect(ptype.props).toEqual([
+          'str', 'str-str', 42, 'publicShorthandProp', 'privateShorthandProp', 'protectedShorthandProp', 'readonlyShorthandProp'
+      ])
 
+      expect(getPropType(TestClass, 'str')).toEqual({kind: TypeKind.String})
+      expect(getPropType(TestClass, 'str-str')).toEqual({kind: TypeKind.String})
       expect(getPropType(TestClass, 42)).toEqual({kind: TypeKind.String})
+      expect(getPropType(TestClass, 'publicShorthandProp')).toEqual({kind: TypeKind.String})
+      expect(getPropType(TestClass, 'privateShorthandProp')).toEqual({kind: TypeKind.Number})
+      expect(getPropType(TestClass, 'protectedShorthandProp')).toEqual({kind: TypeKind.Boolean})
+      expect(getPropType(TestClass, 'readonlyShorthandProp')).toEqual({kind: TypeKind.Reference, type: Date, arguments: []})
    });
 });
 
