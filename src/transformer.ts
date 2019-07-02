@@ -252,7 +252,7 @@ function Transformer(program: ts.Program, context: ts.TransformationContext) {
 			}
 		});
 
-		const type = checker.getTypeAtLocation(node)
+		const type = checker.getTypeAtLocation(node);
 		const newNode = ts.getMutableClone(node);
 
 		newNode.members = ts.visitNodes(node.members, visitClassMember);
