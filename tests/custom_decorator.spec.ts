@@ -1,13 +1,8 @@
-import {
-    getType,
-    mustGetType,
-} from '../src';
-
+import { getType } from '../src';
 import { ReflectiveFactory as ReflectiveFactory1 } from '../dist/types'; // todo don't work
 import { ReflectiveFactory as ReflectiveFactory2 } from '../src';;
 
 const UserDecorator1 = ReflectiveFactory1(function (target: any) { })
-const UserDecorator2 = ReflectiveFactory2(function (target: any) { })
 
 function OtherDecorator(target: any) { }
 
@@ -54,17 +49,5 @@ describe('Custom Decorators', () => {
         const clsType = getType(MyClass2);
         expect(clsType).not.toBeNull();
     });
-
-    it('should throw on non-decorated', () => {
-        expect(() => {
-            mustGetType(MyClassUndecorated);
-        }).toThrow();
-    });
-
-    it('should allow decorators with params', () => {
-        const clsType = mustGetType(ParamClass);
-        expect((ParamClass as any).StrParam).toEqual('string_value');
-    });
-
 });
 

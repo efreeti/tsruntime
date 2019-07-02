@@ -3,13 +3,7 @@
  *
  * note: tests may be need to be disabled until they work correctly.
  */
-import {
-   Reflective,
-   mustGetType,
-   mustGetPropType,
-   getType,
-   Types
-} from '../src/types'
+import { Reflective, getType, Types } from '../src/types'
 
 import { ExternalClass } from './external_classes';
 import {getPropType} from './utils'

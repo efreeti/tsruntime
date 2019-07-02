@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
 export module Types {
-
 	export enum TypeKind {
 		Any = 1,
 		String,
@@ -29,9 +28,6 @@ export module Types {
 		Unknown = 999
 	}
 
-
-
-
 	export type Type = InterfaceType | TupleType |
 		ObjectType | ClassType | ReferenceType | UnionType |
 		StringLiteralType | NumberLiteralType | SimpleType;
@@ -46,19 +42,16 @@ export module Types {
 		initializer?: any //todo
 	}
 
-
 	export interface InterfaceType extends BaseType {
 		kind: TypeKind.Interface
 		name: string
 		arguments: Type[]
 	}
 
-
 	export interface TupleType extends BaseType {
 		kind: TypeKind.Tuple
 		elementTypes: Type[]
 	}
-
 
 	export interface StringLiteralType extends BaseType {
 		kind: TypeKind.StringLiteral
@@ -89,28 +82,21 @@ export module Types {
 		props: (string | number)[]
 		extends?: Types.Type
 	}
-
 }
-
 
 export const REFLECTIVE_KEY = '__is_ts_runtime_reflective_decorator'
 
-type ReflectiveDecorator<T> = T
 export function ReflectiveFactory<T>(fn: T) {
 	return fn as T & { __is_ts_runtime_reflective_decorator: boolean }
 }
 
-
 export const Reflective = ReflectiveFactory(function (target: any) {
 
-})
+});
 
-
-
-export const TypeMetadataKey = "ts-runtime-reflection:type"
-export const SubclassMetadataKey = "ts-runtime-reflection:subtypes"
-export const ShorthandPropertiesMetadataKey = "ts-runtime-reflection:shorthand-properties"
-
+export const TypeMetadataKey = "ts-runtime-reflection:type";
+export const SubclassMetadataKey = "ts-runtime-reflection:subtypes";
+export const ShorthandPropertiesMetadataKey = "ts-runtime-reflection:shorthand-properties";
 
 export function getSubclasses(target: Function): Function[] | undefined {
 	return Reflect.getMetadata(SubclassMetadataKey, target)
@@ -120,28 +106,8 @@ export function getType(target: Function): Types.Type | undefined {
 	return Reflect.getMetadata(TypeMetadataKey, target)
 }
 
-export function mustGetType(target: Function): Types.Type {
-	const type = getType(target)
-	if (type === undefined) {
-		throw new Error("can't find type")
-	}
-	return type
-}
-
-
-
-export function mustGetPropType(target: Function, propertyKey: string | symbol | number): Types.Type {
-	const type = getPropType(target, propertyKey)
-	if (type === undefined) {
-		throw new Error("can't find prop type")
-	}
-	return type
-}
-
-
-
 export function getPropType(target: Function, propertyKey: string | symbol | number): Types.Type | undefined {
 	return Reflect.getMetadata(TypeMetadataKey, target.prototype, propertyKey as any) || (
 		(Reflect.getMetadata(ShorthandPropertiesMetadataKey, target) || {})[propertyKey]
-	)
+	);
 }
