@@ -23,9 +23,7 @@ export function isPropertyModifier(modifier: ts.Modifier) {
 }
 
 export function hasPropertyModifiers(parameter: ts.ParameterDeclaration): boolean {
-	return parameter.modifiers!.length > 0 && parameter.modifiers!.some(
-		modifier => isPropertyModifier(modifier)
-	);
+	return parameter.modifiers && parameter.modifiers.some(modifier => isPropertyModifier(modifier)) || false;
 }
 
 export function isShorthandPropertyDeclaration(parameter: ts.ParameterDeclaration): boolean {
