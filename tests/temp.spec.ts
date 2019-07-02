@@ -1,6 +1,5 @@
 import {
-    getType,
-    mustGetType,
+    getType
 } from '../src';
 import {
     Reflective
