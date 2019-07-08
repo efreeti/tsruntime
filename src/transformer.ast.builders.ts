@@ -94,7 +94,7 @@ export function createParentClassDecorator(parent: ts.Identifier) {
 		'defineMetadata', SubclassMetadataKey, <ReadonlyArray<ts.Expression>>[
 			ts.createArrayLiteral([
 				ts.createSpread(ts.createLogicalOr(
-					createMetadataCall('getMetadata', SubclassMetadataKey, <ReadonlyArray<ts.Expression>>[parent]),
+					createMetadataCall('getOwnMetadata', SubclassMetadataKey, <ReadonlyArray<ts.Expression>>[parent]),
 					ts.createArrayLiteral([])
 				)),
 				ts.createIdentifier('target')
@@ -109,7 +109,7 @@ export function createShorthandPropertyDecorator(propertyName: ts.Identifier, ty
 		'defineMetadata', ShorthandPropertiesMetadataKey, <ReadonlyArray<ts.Expression>>[
 			ts.createObjectLiteral([
 				ts.createSpreadAssignment(ts.createLogicalOr(
-					createMetadataCall('getMetadata', ShorthandPropertiesMetadataKey, <ReadonlyArray<ts.Expression>>[
+					createMetadataCall('getOwnMetadata', ShorthandPropertiesMetadataKey, <ReadonlyArray<ts.Expression>>[
 						ts.createIdentifier('target')
 					]),
 					ts.createObjectLiteral([])
