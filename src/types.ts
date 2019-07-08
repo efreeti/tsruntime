@@ -99,15 +99,28 @@ export const SubclassMetadataKey = "ts-runtime-reflection:subtypes";
 export const ShorthandPropertiesMetadataKey = "ts-runtime-reflection:shorthand-properties";
 
 export function getSubclasses(target: Function): Function[] | undefined {
-	return Reflect.getMetadata(SubclassMetadataKey, target)
+	return Reflect.getOwnMetadata(SubclassMetadataKey, target)
+}
+
+export function getAllLeafSubclasses(type: Function): Function[] {
+	const subclasses = getSubclasses(type) || [];
+
+	return subclasses.reduce(
+		(result, subclass) => {
+			const subclasses = getAllLeafSubclasses(subclass);
+
+			return result.concat(subclasses.length > 0 ? subclasses : [subclass]);
+		},
+		<Function[]>[]
+	);
 }
 
 export function getType(target: Function): Types.Type | undefined {
-	return Reflect.getMetadata(TypeMetadataKey, target)
+	return Reflect.getOwnMetadata(TypeMetadataKey, target)
 }
 
 export function getPropType(target: Function, propertyKey: string | symbol | number): Types.Type | undefined {
-	return Reflect.getMetadata(TypeMetadataKey, target.prototype, propertyKey as any) || (
-		(Reflect.getMetadata(ShorthandPropertiesMetadataKey, target) || {})[propertyKey]
+	return Reflect.getOwnMetadata(TypeMetadataKey, target.prototype, propertyKey as any) || (
+		(Reflect.getOwnMetadata(ShorthandPropertiesMetadataKey, target) || {})[propertyKey]
 	);
 }
